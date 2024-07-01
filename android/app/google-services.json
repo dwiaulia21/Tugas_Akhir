@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "983303350128",
+    "project_id": "aulproject-62c40",
+    "storage_bucket": "aulproject-62c40.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:983303350128:android:c60c6267e4eda5de6e51b5",
+        "android_client_info": {
+          "package_name": "com.awullsapplication.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkI9ktyd6ILBnI0YGv25xL8AZilwRzr38"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
