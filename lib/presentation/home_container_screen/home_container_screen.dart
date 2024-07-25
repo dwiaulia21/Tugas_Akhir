@@ -65,7 +65,7 @@ class HomeContainerScreen extends StatelessWidget {
       case AppRoutes.homePage:
         return HomePage();
       case AppRoutes.messageHistoryTabContainerPage:
-        return MessageHistoryTabContainerPage();
+        return MessageHistoryTabContainerPage(userAnswers: {}, hasilDiagnosa: {}, solusiDiagnosa: {},);
       case AppRoutes.profilePage:
         return ProfilePage();
       case AppRoutes.gejalaScreen: // Tambahkan halaman Cek Gejala

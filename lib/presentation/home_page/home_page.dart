@@ -1,19 +1,37 @@
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:awull_s_application3/widgets/app_bar/custom_app_bar.dart';
 import 'package:awull_s_application3/widgets/app_bar/appbar_subtitle.dart';
-import 'package:awull_s_application3/presentation/home_page/cek_gejala_screen.dart';
 import 'package:awull_s_application3/widgets/app_bar/appbar_trailing_image.dart';
 import 'widgets/categories_item_widget.dart';
 import 'package:awull_s_application3/widgets/custom_elevated_button.dart';
 import 'widgets/home_item_widget.dart';
-import 'package:flutter/material.dart';
 import 'package:awull_s_application3/core/app_export.dart'; // ignore_for_file: must_be_immutable
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
 
-  TextEditingController searchController = TextEditingController();
+  @override
+  _HomePageState createState() => _HomePageState();
+}
 
-   @override
+class _HomePageState extends State<HomePage> {
+  String _userName = 'User'; // Default value
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userName = prefs.getString('nama') ?? 'User'; // Get user name or default to 'User'
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
@@ -42,15 +60,23 @@ class HomePage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 30.v),
+            Text(
+              'Halo, $_userName!', // Display user name
+              style: TextStyle(
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 20.v),
             CustomElevatedButton(
-  height: 50.v,
-  width: 90.h,
-  text: "Cek Disini!",
-  buttonStyle: CustomButtonStyles.fillWhiteA,
-  buttonTextStyle: CustomTextStyles.labelLargePrimary,
-  onPressed: () {
-    print("Navigating to GejalaPage");
-    Navigator.pushNamed(context, AppRoutes.gejalaScreen);
+              height: 50.v,
+              width: 90.h,
+              text: "Cek Disini!",
+              buttonStyle: CustomButtonStyles.fillWhiteA,
+              buttonTextStyle: CustomTextStyles.labelLargePrimary,
+              onPressed: () {
+                print("Navigating to GejalaPage");
+                Navigator.pushNamed(context, AppRoutes.gejalaScreen);
               },
             ),
           ],
@@ -63,7 +89,7 @@ class HomePage extends StatelessWidget {
     return CustomAppBar(
       height: 200.v,
       title: AppbarSubtitle(
-        text: "Hallo!",
+        text: 'Halo, $_userName!', // Display user name in AppBar
         margin: EdgeInsets.only(left: 30.h),
       ),
     );

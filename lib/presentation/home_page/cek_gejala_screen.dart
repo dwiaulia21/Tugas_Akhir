@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:awull_s_application3/presentation/message_history_tab_container_page/message_history_tab_container_page.dart';
+import 'package:awull_s_application3/presentation/home_page/hasil_screen.dart'; // Tambahkan ini
 
 class CekGejalaScreen extends StatefulWidget {
   const CekGejalaScreen({Key? key}) : super(key: key);
@@ -30,7 +32,7 @@ class _CekGejalaScreenState extends State<CekGejalaScreen> {
     });
 
     try {
-      final response = await http.get(Uri.parse('http://192.168.111.111/cekginjal/api.php/gejala'));
+      final response = await http.get(Uri.parse('http://192.168.235.111/cekginjal/api.php/gejala'));
       if (response.statusCode == 200) {
         final String responseBody = response.body;
         final cleanedResponse = responseBody.trim().replaceAll('\uFEFF', '');
@@ -49,7 +51,7 @@ class _CekGejalaScreenState extends State<CekGejalaScreen> {
         }
       } else {
         setState(() {
-          errorMessage = 'Gagal memuat data: ${response.reasonPhrase}';
+          errorMessage = 'Gagal memuat gejala: ${response.reasonPhrase}';
           isLoading = false;
         });
       }
@@ -64,7 +66,7 @@ class _CekGejalaScreenState extends State<CekGejalaScreen> {
   Future<void> submitJawaban(int index, String jawaban) async {
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.111.111/cekginjal/api.php/submit'),
+        Uri.parse('http://192.168.235.111/cekginjal/api.php/submit'),
         headers: {"Content-Type": "application/json"},
         body: json.encode({'jawaban': jawaban}),
       );
@@ -105,32 +107,41 @@ class _CekGejalaScreenState extends State<CekGejalaScreen> {
   }
 
   void saveToDatabase() async {
-  final payload = json.encode({
-    'id_user': '123', // Ganti dengan ID pengguna yang sesuai
-    'userAnswers': json.encode(userAnswers),
-    'hasilDiagnosa': json.encode(hasilDiagnosa),
-  });
+    final payload = json.encode({
+      'id_user': '123', // Ganti dengan ID pengguna yang sesuai
+      'userAnswers': userAnswers,
+      'hasilDiagnosa': hasilDiagnosa
+    });
 
-  print('Payload: $payload'); // Tambahkan ini untuk logging
+    print('Payload: $payload'); // Tambahkan ini untuk logging
 
-  try {
-    final response = await http.post(
-      Uri.parse('http://192.168.111.111/cekginjal/api.php/save_history'),
-      headers: {"Content-Type": "application/json"},
-      body: payload,
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.235.111/cekginjal/api.php/save_history'),
+        headers: {"Content-Type": "application/json"},
+        body: payload,
+      );
 
-    if (response.statusCode == 200) {
-      print('Data berhasil disimpan ke database.');
-    } else {
-      print('Gagal menyimpan data ke database: ${response.reasonPhrase}');
+      if (response.statusCode == 200) {
+        print('Data berhasil disimpan ke database.');
+
+        // Navigate to MessageHistoryTabContainerPage after saving to database
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MessageHistoryTabContainerPage(
+              userAnswers: userAnswers,
+              hasilDiagnosa: hasilDiagnosa, solusiDiagnosa: {},
+            ),
+          ),
+        );
+      } else {
+        print('Gagal menyimpan data ke database: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Exception saat menyimpan data ke database: $e');
     }
-  } catch (e) {
-    print('Exception saat menyimpan data ke database: $e');
   }
-}
-
-
 
   void calculateResults() {
     List<int> ginjalAkut = [1, 2, 3, 4, 5, 6];
@@ -209,17 +220,25 @@ class _CekGejalaScreenState extends State<CekGejalaScreen> {
                                 onPressed: () {
                                   submitJawaban(index, 'ya');
                                 },
-                                child: Text('Ya', style: TextStyle(color: Colors.white)),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                ),
+                                child: Text('Ya', style: TextStyle(color: Colors.white, fontSize: 16)),
                               ),
                               ElevatedButton(
                                 onPressed: () {
                                   submitJawaban(index, 'tidak');
                                 },
-                                child: Text('Tidak', style: TextStyle(color: Colors.white)),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                ),
+                                child: Text('Tidak', style: TextStyle(color: Colors.white, fontSize: 16)),
                               ),
                             ],
                           ),
-                          Divider(),
+                          SizedBox(height: 20),
                         ],
                       );
                     },
@@ -227,71 +246,4 @@ class _CekGejalaScreenState extends State<CekGejalaScreen> {
                 ),
     );
   }
-}
-
-class HasilScreen extends StatelessWidget {
-  final Map<String, double> hasilDiagnosa;
-  final Map<int, String> userAnswers;
-
-  HasilScreen({required this.hasilDiagnosa, required this.userAnswers});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Hasil Diagnosa'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Penyakit yang Anda alami:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 20),
-              for (var entry in hasilDiagnosa.entries)
-                Text('${entry.key} = ${entry.value.toStringAsFixed(2)}%', style: TextStyle(fontSize: 16)),
-              SizedBox(height: 20),
-              Text('Solusi untuk penyakit Anda:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 10),
-              for (var entry in hasilDiagnosa.entries)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('${entry.key}:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    Text(getSolution(entry.key), style: TextStyle(fontSize: 16)),
-                    SizedBox(height: 10),
-                  ],
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  String getSolution(String penyakit) {
-    switch (penyakit) {
-      case 'Ginjal Akut':
-        return 'Minum air putih yang cukup dan hindari konsumsi garam berlebih.';
-      case 'Ginjal Kronis':
-        return 'Konsultasikan dengan dokter dan pertimbangkan diet rendah protein.';
-      case 'Batu Ginjal':
-        return 'Hindari makanan tinggi oksalat seperti bayam dan bit, serta minum banyak air.';
-      case 'Infeksi Ginjal':
-        return 'Minum antibiotik sesuai resep dokter dan jaga kebersihan pribadi.';
-      case 'Kanker Ginjal':
-        return 'Konsultasikan dengan ahli onkologi untuk penanganan lebih lanjut.';
-      case 'Gagal Ginjal':
-        return 'Ikuti saran dokter, mungkin perlu dialisis atau transplantasi ginjal.';
-      default:
-        return 'Solusi belum tersedia untuk penyakit ini.';
-    }
-  }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: CekGejalaScreen(),
-  ));
 }

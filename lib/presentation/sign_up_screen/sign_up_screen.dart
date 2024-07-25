@@ -1,5 +1,3 @@
-import 'package:awull_s_application3/widgets/app_bar/custom_app_bar.dart';
-import 'package:awull_s_application3/widgets/app_bar/appbar_leading_image.dart';
 import 'package:awull_s_application3/widgets/app_bar/appbar_subtitle_two.dart';
 import 'package:awull_s_application3/widgets/custom_text_form_field.dart';
 import 'package:awull_s_application3/widgets/custom_checkbox_button.dart';
@@ -7,216 +5,117 @@ import 'package:awull_s_application3/widgets/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
 import 'package:awull_s_application3/core/app_export.dart';
 import 'package:awull_s_application3/presentation/sign_up_success_dialog/sign_up_success_dialog.dart';
+import 'package:http/http.dart' as http;
 
-// ignore_for_file: must_be_immutable
 class SignUpScreen extends StatelessWidget {
-  SignUpScreen({Key? key})
-      : super(
-          key: key,
+  // Controllers for text fields
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  // Base URL of your PHP backend
+  static const String baseUrl = 'http://10.0.167.213/cekginjal/register_api.php';
+
+  // Method to send registration data to PHP backend
+  Future<void> registerUser(BuildContext context) async {
+    try {
+      final response = await http.post(
+        Uri.parse(baseUrl),
+        body: {
+          'nama': nameController.text,
+          'email': emailController.text,
+          'password': passwordController.text,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('Success'),
+            content: Text('Registration Successful!'),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Navigate to login screen or any other screen as needed
+                },
+              ),
+            ],
+          ),
         );
-
-  TextEditingController nameEditTextController = TextEditingController();
-
-  TextEditingController emailEditTextController = TextEditingController();
-
-  TextEditingController passwordEditTextController = TextEditingController();
-
-  bool agreeCheckBox = false;
-
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+      } else {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('Error'),
+            content: Text('Registration Failed!'),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error: $e');
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text('Error'),
+          content: Text('Failed to connect to server. Please try again later.'),
+          actions: [
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: appTheme.whiteA700,
-        resizeToAvoidBottomInset: false,
-        appBar: _buildAppBar(context),
-        body: SizedBox(
-          width: SizeUtils.width,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Sign Up'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(labelText: 'Name'),
             ),
-            child: Form(
-              key: _formKey,
-              child: Container(
-                width: double.maxFinite,
-                padding: EdgeInsets.symmetric(
-                  horizontal: 24.h,
-                  vertical: 39.v,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildNameEditText(context),
-                    SizedBox(height: 16.v),
-                    _buildEmailEditText(context),
-                    SizedBox(height: 16.v),
-                    _buildPasswordEditText(context),
-                    SizedBox(height: 28.v),
-                    _buildSignUpButton(context),
-                    SizedBox(height: 26.v),
-                    Padding( 
-                      padding: EdgeInsets.only(left: 44.h),
-                      child: Row(
-                        children: [
-                          Text(
-                            "Already have an account?",
-                            style: CustomTextStyles.bodyMediumGray600,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              onTapTxtLogIn(context);
-                            },
-                            child: Padding(
-                              padding: EdgeInsets.only(left: 4.h),
-                              child: Text(
-                                "Log In",
-                                style:
-                                    CustomTextStyles.titleSmallPrimarySemiBold,
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 5.v)
-                  ],
-                ),
-              ),
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(labelText: 'Email'),
             ),
-          ),
+            TextField(
+              controller: passwordController,
+              decoration: InputDecoration(labelText: 'Password'),
+              obscureText: true,
+            ),
+            SizedBox(height: 16.0),
+            ElevatedButton(
+              onPressed: () {
+                registerUser(context);
+              },
+              child: Text('Sign Up'),
+            ),
+          ],
         ),
       ),
     );
-  }
-
-  /// Section Widget
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return CustomAppBar(
-      leadingWidth: 56.h,
-      leading: AppbarLeadingImage(
-        imagePath: ImageConstant.imgIconChevronLeft,
-        margin: EdgeInsets.only(
-          left: 32.h,
-          top: 8.v,
-          bottom: 8.v,
-        ),
-      ),
-      centerTitle: true,
-      title: AppbarSubtitleTwo(
-        text: "Sign Up",
-      ),
-    );
-  }
-
-  /// Section Widget
-  Widget _buildNameEditText(BuildContext context) {
-    return CustomTextFormField(
-      controller: nameEditTextController,
-      hintText: "Enter your name",
-      prefix: Container(
-        margin: EdgeInsets.fromLTRB(24.h, 16.v, 16.h, 16.v),
-        child: CustomImageView(
-          imagePath: ImageConstant.imgLock,
-          height: 24.adaptSize,
-          width: 24.adaptSize,
-        ),
-      ),
-      prefixConstraints: BoxConstraints(
-        maxHeight: 56.v,
-      ),
-      contentPadding: EdgeInsets.only(
-        top: 18.v,
-        right: 30.h,
-        bottom: 18.v,
-      ),
-    );
-  }
-
-  /// Section Widget
-  Widget _buildEmailEditText(BuildContext context) {
-    return CustomTextFormField(
-      controller: emailEditTextController,
-      hintText: "Enter your email",
-      textInputType: TextInputType.emailAddress,
-      prefix: Container(
-        margin: EdgeInsets.fromLTRB(24.h, 16.v, 16.h, 16.v),
-        child: CustomImageView(
-          imagePath: ImageConstant.imgCheckmark,
-          height: 24.adaptSize,
-          width: 24.adaptSize,
-        ),
-      ),
-      prefixConstraints: BoxConstraints(
-        maxHeight: 56.v,
-      ),
-      contentPadding: EdgeInsets.only(
-        top: 18.v,
-        right: 30.h,
-        bottom: 18.v,
-      ),
-    );
-  }
-
-  /// Section Widget
-  Widget _buildPasswordEditText(BuildContext context) {
-    return CustomTextFormField(
-      controller: passwordEditTextController,
-      hintText: "Enter your password",
-      textInputAction: TextInputAction.done,
-      textInputType: TextInputType.visiblePassword,
-      prefix: Container(
-        margin: EdgeInsets.fromLTRB(24.h, 16.v, 16.h, 16.v),
-        child: CustomImageView(
-          imagePath: ImageConstant.imgLocation,
-          height: 24.adaptSize,
-          width: 24.adaptSize,
-        ),
-      ),
-      prefixConstraints: BoxConstraints(
-        maxHeight: 56.v,
-      ),
-      suffix: Container(
-        margin: EdgeInsets.fromLTRB(30.h, 16.v, 24.h, 16.v),
-        child: CustomImageView(
-          imagePath: ImageConstant.imgEye,
-          height: 24.adaptSize,
-          width: 24.adaptSize,
-        ),
-      ),
-      suffixConstraints: BoxConstraints(
-        maxHeight: 56.v,
-      ),
-      obscureText: true,
-    );
-  }
-
-  /// Section Widget
-  Widget _buildSignUpButton(BuildContext context) {
-    return CustomElevatedButton(
-      text: "Sign Up",
-      onPressed: () {
-        onTapSignUpButton(context);
-      },
-    );
-  }
-
-  /// Displays a dialog with the [SignUpSuccessDialog] content.
-  onTapSignUpButton(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-              content: SignUpSuccessDialog(),
-              backgroundColor: Colors.transparent,
-              contentPadding: EdgeInsets.zero,
-              insetPadding: const EdgeInsets.only(left: 0),
-            ));
-  }
-
-  /// Navigates to the loginScreen when the action is triggered.
-  onTapTxtLogIn(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.loginScreen);
   }
 }

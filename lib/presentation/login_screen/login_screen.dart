@@ -1,34 +1,303 @@
-import 'package:awull_s_application3/widgets/app_bar/custom_app_bar.dart';
-import 'package:awull_s_application3/widgets/app_bar/appbar_leading_image.dart';
-import 'package:awull_s_application3/widgets/app_bar/appbar_subtitle_two.dart';
-import 'package:awull_s_application3/widgets/custom_text_form_field.dart';
-import 'package:awull_s_application3/widgets/custom_elevated_button.dart';
-import 'package:awull_s_application3/widgets/custom_outlined_button.dart';
+// import 'dart:convert';
+// import 'package:flutter/material.dart';
+// import 'package:http/http.dart' as http;
+
+// class LoginScreen extends StatefulWidget {
+//   @override
+//   _LoginScreenState createState() => _LoginScreenState();
+// }
+
+// class _LoginScreenState extends State<LoginScreen> {
+//   TextEditingController emailController = TextEditingController();
+//   TextEditingController passwordController = TextEditingController();
+//   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+//   bool _obscureText = true;
+
+//   Future<void> onTapLogin(BuildContext context) async {
+//     if (!_formKey.currentState!.validate()) {
+//       return;
+//     }
+
+//     try {
+//       final response = await http.post(
+//         Uri.parse('http://192.168.220.111/cekginjal/login_api.php'),
+//         headers: {'Content-Type': 'application/json'},
+//         body: json.encode({
+//           'email': emailController.text,
+//           'password': passwordController.text,
+//         }),
+//       );
+
+//       print('Response status: ${response.statusCode}');
+//       print('Response body: ${response.body}');
+
+//       if (response.statusCode == 200) {
+//         final data = json.decode(response.body);
+//         if (data['status'] == 'success') {
+//           if (data['role'] == 0) {
+//             Navigator.pushReplacementNamed(context, '/admin');
+//           } else if (data['role'] == 2) {
+//             Navigator.pushReplacementNamed(context, '/pakar');
+//           } else {
+//             Navigator.pushReplacementNamed(context, '/home_container_screen');
+//           }
+//         } else {
+//           ScaffoldMessenger.of(context).showSnackBar(
+//             SnackBar(content: Text('Login gagal: ${data['message']}')),
+//           );
+//         }
+//       } else {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Gagal terhubung: ${response.statusCode}')),
+//         );
+//       }
+//     } catch (e) {
+//       print('Error: $e');
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Terjadi kesalahan: $e')),
+//       );
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return SafeArea(
+//       child: Scaffold(
+//         backgroundColor: Colors.white,
+//         resizeToAvoidBottomInset: false,
+//         appBar: AppBar(
+//           title: Text("Login"),
+//         ),
+//         body: SizedBox(
+//           width: MediaQuery.of(context).size.width,
+//           child: SingleChildScrollView(
+//             padding: EdgeInsets.only(
+//               bottom: MediaQuery.of(context).viewInsets.bottom,
+//             ),
+//             child: Form(
+//               key: _formKey,
+//               child: Container(
+//                 width: double.maxFinite,
+//                 padding: EdgeInsets.symmetric(
+//                   horizontal: 24,
+//                   vertical: 39,
+//                 ),
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     TextFormField(
+//                       controller: emailController,
+//                       decoration: InputDecoration(
+//                         hintText: "Enter your email",
+//                         prefixIcon: Icon(Icons.email),
+//                       ),
+//                       keyboardType: TextInputType.emailAddress,
+//                       validator: (value) {
+//                         if (value == null || value.isEmpty) {
+//                           return 'Please enter your email';
+//                         }
+//                         return null;
+//                       },
+//                     ),
+//                     SizedBox(height: 16),
+//                     TextFormField(
+//                       controller: passwordController,
+//                       decoration: InputDecoration(
+//                         hintText: "Enter your password",
+//                         prefixIcon: Icon(Icons.lock),
+//                         suffixIcon: IconButton(
+//                           icon: Icon(
+//                             _obscureText ? Icons.visibility : Icons.visibility_off,
+//                           ),
+//                           onPressed: () {
+//                             setState(() {
+//                               _obscureText = !_obscureText;
+//                             });
+//                           },
+//                         ),
+//                       ),
+//                       obscureText: _obscureText,
+//                       validator: (value) {
+//                         if (value == null || value.isEmpty) {
+//                           return 'Please enter your password';
+//                         }
+//                         return null;
+//                       },
+//                     ),
+//                     SizedBox(height: 28),
+//                     ElevatedButton(
+//                       onPressed: () {
+//                         onTapLogin(context);
+//                       },
+//                       child: Text("Login"),
+//                     ),
+//                     SizedBox(height: 26),
+//                     Row(
+//                       mainAxisAlignment: MainAxisAlignment.center,
+//                       children: [
+//                         Text("Don't have an account?"),
+//                         TextButton(
+//                           onPressed: () {
+//                             Navigator.pushNamed(context, '/sign_up_screen');
+//                           },
+//                           child: Text("Sign Up"),
+//                         )
+//                       ],
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:awull_s_application3/core/app_export.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-// ignore_for_file: must_be_immutable
-class LoginScreen extends StatelessWidget {
-  LoginScreen({Key? key})
-      : super(
-          key: key,
-        );
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
 
+class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
-
   TextEditingController passwordController = TextEditingController();
-
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _obscureText = true;
+
+// Future<void> onTapLogin(BuildContext context) async {
+//   if (!_formKey.currentState!.validate()) {
+//     return;
+//   }
+
+//   try {
+//     final response = await http.post(
+//       Uri.parse('http://192.168.235.111/cekginjal/login_api.php'),
+//       headers: {'Content-Type': 'application/json'},
+//       body: json.encode({
+//         'email': emailController.text,
+//         'password': passwordController.text,
+//       }),
+//     );
+
+//     print('Response status: ${response.statusCode}');
+//     print('Response body: ${response.body}');
+
+//     if (response.statusCode == 200) {
+//       final data = json.decode(response.body);
+//       if (data['status'] == 'success') {
+//         final prefs = await SharedPreferences.getInstance();
+        
+//         // Periksa apakah 'nama' ada dan tidak null
+//         final userName = data['nama'] ?? 'User'; // Jika 'nama' null, gunakan 'User' sebagai default
+//         await prefs.setString('token', data['token'] ?? '');
+//         await prefs.setInt('id_user', int.tryParse(data['id_user']) ?? 0);
+//         await prefs.setString('nama', userName);
+//         print('token : ${data['token']}');
+
+//         if (data['role'] == '0') {
+//           Navigator.pushReplacementNamed(context, '/admin');
+//         } else if (data['role'] == '2') {
+//           Navigator.pushReplacementNamed(context, '/pakar');
+//         } else {
+//           Navigator.pushReplacementNamed(context, '/home_container_screen');
+//         }
+//       } else {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('Login gagal: ${data['message']}')),
+//         );
+//       }
+//     } else {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Gagal terhubung: ${response.statusCode}')),
+//       );
+//     }
+//   } catch (e) {
+//     print('Error: $e');
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text('Terjadi kesalahan: $e')),
+//     );
+//   }
+// }
+Future<void> onTapLogin(BuildContext context) async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.235.111/cekginjal/login_api.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'email': emailController.text,
+          'password': passwordController.text,
+        }),
+      );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['status'] == 'success') {
+          final prefs = await SharedPreferences.getInstance();
+
+          // Periksa apakah 'nama' ada dan tidak null
+          final userName = data['nama'] ?? 'User'; // Jika 'nama' null, gunakan 'User' sebagai default
+          await prefs.setString('token', data['token'] ?? '');
+          await prefs.setInt('id_user', int.tryParse(data['id_user']) ?? 0);
+          await prefs.setString('nama', userName);
+
+          print('Token: ${data['token']}');
+          print('ID User: ${data['id_user']}');
+          print('Nama: $userName');
+          
+          if (data['role'] == '0') {
+            Navigator.pushReplacementNamed(context, '/admin');
+          } else if (data['role'] == '2') {
+            Navigator.pushReplacementNamed(context, '/pakar');
+          } else {
+            Navigator.pushReplacementNamed(context, '/home_container_screen');
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Login gagal: ${data['message']}')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal terhubung: ${response.statusCode}')),
+        );
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Terjadi kesalahan: $e')),
+      );
+    }
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: appTheme.whiteA700,
+        backgroundColor: Colors.white,
         resizeToAvoidBottomInset: false,
-        appBar: _buildAppBar(context),
+        appBar: AppBar(
+          title: Text("Login"),
+        ),
         body: SizedBox(
-          width: SizeUtils.width,
+          width: MediaQuery.of(context).size.width,
           child: SingleChildScrollView(
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -38,115 +307,71 @@ class LoginScreen extends StatelessWidget {
               child: Container(
                 width: double.maxFinite,
                 padding: EdgeInsets.symmetric(
-                  horizontal: 24.h,
-                  vertical: 39.v,
+                  horizontal: 24,
+                  vertical: 39,
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomTextFormField(
+                    TextFormField(
                       controller: emailController,
-                      hintText: "Enter your email",
-                      textInputType: TextInputType.emailAddress,
-                      prefix: Container(
-                        margin: EdgeInsets.fromLTRB(24.h, 16.v, 16.h, 16.v),
-                        child: CustomImageView(
-                          imagePath: ImageConstant.imgCheckmark,
-                          height: 24.adaptSize,
-                          width: 24.adaptSize,
-                        ),
+                      decoration: InputDecoration(
+                        hintText: "Enter your email",
+                        prefixIcon: Icon(Icons.email),
                       ),
-                      prefixConstraints: BoxConstraints(
-                        maxHeight: 56.v,
-                      ),
-                      contentPadding: EdgeInsets.only(
-                        top: 18.v,
-                        right: 30.h,
-                        bottom: 18.v,
-                      ),
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        return null;
+                      },
                     ),
-                    SizedBox(height: 16.v),
-                    CustomTextFormField(
+                    SizedBox(height: 16),
+                    TextFormField(
                       controller: passwordController,
-                      hintText: "Enter your password",
-                      textInputAction: TextInputAction.done,
-                      textInputType: TextInputType.visiblePassword,
-                      prefix: Container(
-                        margin: EdgeInsets.fromLTRB(24.h, 16.v, 16.h, 16.v),
-                        child: CustomImageView(
-                          imagePath: ImageConstant.imgLocation,
-                          height: 24.adaptSize,
-                          width: 24.adaptSize,
+                      decoration: InputDecoration(
+                        hintText: "Enter your password",
+                        prefixIcon: Icon(Icons.lock),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureText ? Icons.visibility : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureText = !_obscureText;
+                            });
+                          },
                         ),
                       ),
-                      prefixConstraints: BoxConstraints(
-                        maxHeight: 56.v,
-                      ),
-                      suffix: Container(
-                        margin: EdgeInsets.fromLTRB(30.h, 16.v, 24.h, 16.v),
-                        child: CustomImageView(
-                          imagePath: ImageConstant.imgEye,
-                          height: 24.adaptSize,
-                          width: 24.adaptSize,
-                        ),
-                      ),
-                      suffixConstraints: BoxConstraints(
-                        maxHeight: 56.v,
-                      ),
-                      obscureText: true,
+                      obscureText: _obscureText,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        return null;
+                      },
                     ),
-                    SizedBox(height: 10.v),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: GestureDetector(
-                        onTap: () {
-                          onTapTxtForgotPassword(context);
-                        },
-                        child: Text(
-                          "Forgot Password?",
-                          style: CustomTextStyles.titleSmallPrimary,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 32.v),
-                    CustomElevatedButton(
-                      text: "Login",
+                    SizedBox(height: 28),
+                    ElevatedButton(
                       onPressed: () {
                         onTapLogin(context);
                       },
+                      child: Text("Login"),
                     ),
-                    SizedBox(height: 25.v),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 48.h),
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(bottom: 1.v),
-                              child: Text(
-                                "Don’t have an account?",
-                                style: CustomTextStyles.bodyMediumGray600,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                onTapTxtSignUp(context);
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.only(left: 4.h),
-                                child: Text(
-                                  "Sign Up",
-                                  style: CustomTextStyles
-                                      .titleSmallPrimarySemiBold,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
+                    SizedBox(height: 26),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Don't have an account?"),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/sign_up_screen');
+                          },
+                          child: Text("Sign Up"),
+                        )
+                      ],
                     ),
-                    SizedBox(height: 34.v),
-                    SizedBox(height: 29.v),
                   ],
                 ),
               ),
@@ -155,41 +380,5 @@ class LoginScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  /// Section Widget
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return CustomAppBar(
-      leadingWidth: 56.h,
-      leading: AppbarLeadingImage(
-        imagePath: ImageConstant.imgIconChevronLeft,
-        margin: EdgeInsets.only(
-          left: 32.h,
-          top: 8.v,
-          bottom: 8.v,
-        ),
-      ),
-      centerTitle: true,
-      title: AppbarSubtitleTwo(
-        text: "Login",
-      ),
-    );
-  }
-
-
-
-  /// Navigates to the resetPasswordEmailTabContainerScreen when the action is triggered.
-  onTapTxtForgotPassword(BuildContext context) {
-    Navigator.pushNamed(
-        context, AppRoutes.resetPasswordEmailTabContainerScreen);
-  }
-
-  onTapLogin(BuildContext context) {
-    // TODO: implement Actions
-  }
-
-  /// Navigates to the signUpScreen when the action is triggered.
-  onTapTxtSignUp(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.signUpScreen);
   }
 }
