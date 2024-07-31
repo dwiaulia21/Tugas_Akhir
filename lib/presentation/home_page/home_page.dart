@@ -60,14 +60,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             SizedBox(height: 30.v),
-            Text(
-              'Halo, $_userName!', // Display user name
-              style: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 20.v),
             CustomElevatedButton(
               height: 50.v,
               width: 90.h,
@@ -89,7 +81,7 @@ class _HomePageState extends State<HomePage> {
     return CustomAppBar(
       height: 200.v,
       title: AppbarSubtitle(
-        text: 'Halo, $_userName!', // Display user name in AppBar
+        text: 'Halo!', // Display user name in AppBar
         margin: EdgeInsets.only(left: 30.h),
       ),
     );

@@ -1,23 +1,25 @@
-import 'package:awull_s_application3/widgets/app_bar/appbar_subtitle_two.dart';
-import 'package:awull_s_application3/widgets/custom_text_form_field.dart';
-import 'package:awull_s_application3/widgets/custom_checkbox_button.dart';
-import 'package:awull_s_application3/widgets/custom_elevated_button.dart';
 import 'package:flutter/material.dart';
-import 'package:awull_s_application3/core/app_export.dart';
-import 'package:awull_s_application3/presentation/sign_up_success_dialog/sign_up_success_dialog.dart';
 import 'package:http/http.dart' as http;
 
-class SignUpScreen extends StatelessWidget {
-  // Controllers for text fields
+class SignUpScreen extends StatefulWidget {
+  @override
+  _SignUpScreenState createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  // Base URL of your PHP backend
-  static const String baseUrl = 'http://10.0.167.213/cekginjal/register_api.php';
+  static const String baseUrl = 'http://192.168.235.111/cekginjal/register_api.php';
 
-  // Method to send registration data to PHP backend
   Future<void> registerUser(BuildContext context) async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
     try {
       final response = await http.post(
         Uri.parse(baseUrl),
@@ -25,6 +27,7 @@ class SignUpScreen extends StatelessWidget {
           'nama': nameController.text,
           'email': emailController.text,
           'password': passwordController.text,
+          'alamat': addressController.text,
         },
       );
 
@@ -84,36 +87,143 @@ class SignUpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Sign Up'),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(labelText: 'Name'),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          title: Text("Sign Up"),
+        ),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Form(
+            key: _formKey,
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 39,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Welcome! Sign up to create your account",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  TextFormField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      hintText: "Enter your name",
+                      prefixIcon: Icon(Icons.person),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your name';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      hintText: "Enter your email",
+                      prefixIcon: Icon(Icons.email),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your email';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: passwordController,
+                    decoration: InputDecoration(
+                      hintText: "Enter your password",
+                      prefixIcon: Icon(Icons.lock),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: addressController,
+                    decoration: InputDecoration(
+                      hintText: "Enter your address",
+                      prefixIcon: Icon(Icons.home),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your address';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 28),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        registerUser(context);
+                      },
+                      child: Text(
+                        "Sign Up",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: EdgeInsets.symmetric(vertical: 30),
+                        textStyle: TextStyle(fontSize: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 26),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Already have an account?"),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/login_screen');
+                        },
+                        child: Text("Login"),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(labelText: 'Email'),
-            ),
-            TextField(
-              controller: passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () {
-                registerUser(context);
-              },
-              child: Text('Sign Up'),
-            ),
-          ],
+          ),
         ),
       ),
     );

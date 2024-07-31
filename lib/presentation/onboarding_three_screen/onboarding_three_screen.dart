@@ -75,8 +75,8 @@ class OnboardingThreeScreen extends StatelessWidget {
                   right: 45.h,
                 ),
                 child: Text(
-                  "Get connect our Online Consultation",
-                  maxLines: 2,
+                  "Temukan informasi lengkap tentang diare dan cara penanganannya di sini!",
+                  maxLines: 4,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.titleLarge!.copyWith(
                     height: 1.50,

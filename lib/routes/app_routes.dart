@@ -12,7 +12,6 @@ import '../presentation/reset_password_email_tab_container_screen/reset_password
 import '../presentation/reset_password_verify_code_screen/reset_password_verify_code_screen.dart';
 import '../presentation/create_new_password_screen/create_new_password_screen.dart';
 import '../presentation/home_container_screen/home_container_screen.dart';
-import '../presentation/pharmacy_screen/pharmacy_screen.dart';
 import '../presentation/location_screen/location_screen.dart';
 import '../presentation/app_navigation_screen/app_navigation_screen.dart';
 
@@ -95,7 +94,6 @@ class AppRoutes {
     resetPasswordVerifyCodeScreen: (context) => ResetPasswordVerifyCodeScreen(),
     createNewPasswordScreen: (context) => CreateNewPasswordScreen(),
     homeContainerScreen: (context) => HomeContainerScreen(),
-    pharmacyScreen: (context) => PharmacyScreen(),
     locationScreen: (context) => LocationScreen(),
     appNavigationScreen: (context) => AppNavigationScreen()
   };

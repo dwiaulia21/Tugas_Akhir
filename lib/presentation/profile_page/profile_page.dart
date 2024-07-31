@@ -1,215 +1,190 @@
-import 'package:awull_s_application3/widgets/custom_icon_button.dart';
-import 'widgets/profilelistsection_item_widget.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:awull_s_application3/core/app_export.dart'; // ignore_for_file: must_be_immutable
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key})
-      : super(
-          key: key,
-        );
+class ProfilePage extends StatefulWidget {
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  late Future<User> _userFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _userFuture = _fetchUserData();
+  }
+
+  Future<User> _fetchUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final idUser = prefs.getInt('id_user');
+
+    if (idUser == null) {
+      throw Exception('User not logged in');
+    }
+
+    final response = await http.get(
+      Uri.parse('http://192.168.235.111/cekginjal/get_user_data.php?id_user=$idUser'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['status'] == 'success') {
+        return User.fromJson(data['data']);
+      } else {
+        throw Exception('Failed to load user data: ${data['message']}');
+      }
+    } else {
+      throw Exception('Failed to load user data');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        extendBody: true,
-        extendBodyBehindAppBar: true,
         backgroundColor: Colors.transparent,
         body: Container(
-          width: SizeUtils.width,
-          height: SizeUtils.height,
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment(0.5, 0),
               end: Alignment(0.5, 1),
-              colors: [
-                theme.colorScheme.secondaryContainer,
-                theme.colorScheme.onError
-              ],
+              colors: [Colors.blue, Colors.green],
             ),
           ),
-          child: Container(
-            width: double.maxFinite,
-            decoration: AppDecoration.linear,
-            child: Column(
-              children: [
-                SizedBox(height: 44.v),
-                _buildProfileSection(context),
-                SizedBox(height: 38.v),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 20.h,
-                    vertical: 29.v,
-                  ),
-                  decoration: AppDecoration.white.copyWith(
-                    borderRadius: BorderRadiusStyle.customBorderTL30,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(height: 5.v),
-                      _buildMySaveSection(context),
-                      SizedBox(height: 14.v),
-                      SizedBox(height: 14.v),
-                      SizedBox(height: 14.v),
-                      _buildLogoutSection(context)
-                    ],
-                  ),
-                )
-              ],
-            ),
+          child: FutureBuilder<User>(
+            future: _userFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else if (snapshot.hasData) {
+                final user = snapshot.data!;
+                return Column(
+                  children: [
+                    SizedBox(height: 44),
+                    _buildProfileSection(user),
+                    SizedBox(height: 38),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 29),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(height: 5),
+                          _buildLogoutSection(context),
+                        ],
+                      ),
+                    )
+                  ],
+                );
+              } else {
+                return Center(child: Text('No data available'));
+              }
+            },
           ),
         ),
       ),
     );
   }
 
-  /// Section Widget
-  Widget _buildProfileSection(BuildContext context) {
+  Widget _buildProfileSection(User user) {
     return Column(
       children: [
         SizedBox(
-          height: 82.v,
-          width: 81.h,
+          height: 82,
+          width: 81,
           child: Stack(
             alignment: Alignment.bottomRight,
             children: [
-              CustomImageView(
-                imagePath: ImageConstant.imgEllipse27,
-                height: 80.adaptSize,
-                width: 80.adaptSize,
-                radius: BorderRadius.circular(
-                  40.h,
-                ),
-                alignment: Alignment.center,
+              CircleAvatar(
+                radius: 40,
+                backgroundImage: AssetImage('assets/images/profile_image.png'),
               ),
-              CustomIconButton(
-                height: 24.adaptSize,
-                width: 24.adaptSize,
-                padding: EdgeInsets.all(4.h),
-                decoration: IconButtonStyleHelper.fillWhiteA,
-                alignment: Alignment.bottomRight,
-                child: CustomImageView(
-                  imagePath: ImageConstant.imgCamera,
-                ),
+              IconButton(
+                icon: Icon(Icons.camera_alt),
+                onPressed: () {
+                  // Implementasikan perubahan gambar profil jika diperlukan
+                },
               )
             ],
           ),
         ),
-        SizedBox(height: 19.v),
+        SizedBox(height: 19),
         Text(
-          "Dwi Aulia",
-          style: CustomTextStyles.titleMediumWhiteA70018,
-        )
+          user.name,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          user.email,
+          style: TextStyle(fontSize: 16),
+        ),
+        Text(
+          user.address,
+          style: TextStyle(fontSize: 16),
+        ),
       ],
     );
   }
 
-  /// Section Widget
-Widget _buildMySaveSection(BuildContext context) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        'Edit Name',
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-      TextFormField(
-        decoration: InputDecoration(
-          hintText: 'Enter new name',
+  Widget _buildLogoutSection(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
+        Navigator.pushNamedAndRemoveUntil(context, '/login_screen', (Route<dynamic> route) => false);
+      },
+      child: Container(
+        height: 48,
+        width: 335,
+        decoration: BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.logout, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                "Logout",
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
+            ],
+          ),
         ),
       ),
-      SizedBox(height: 20),
-      Text(
-        'Edit Email',
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-      TextFormField(
-        decoration: InputDecoration(
-          hintText: 'Enter new Email',
-        ),
-      ),
-      SizedBox(height: 20),
-      Text(
-        'Change Password',
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-      TextFormField(
-        obscureText: true,
-        decoration: InputDecoration(
-          hintText: 'Enter new password',
-        ),
-      ),
-      
-    ],
-  );
+    );
+  }
 }
 
-  /// Section Widget
-  Widget _buildLogoutSection(BuildContext context) {
-  return GestureDetector(
-    onTap: () {
-      Navigator.pushNamed(context, '/login_screen');
-    },
-    child: SizedBox(
-      height: 48.v,
-      width: 335.h,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Container(
-              height: 48.v,
-              width: 43.h,
-              decoration: BoxDecoration(
-                color: appTheme.red50,
-                borderRadius: BorderRadius.circular(
-                  24.h,
-                ),
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.center,
-            child: Padding(
-              padding: EdgeInsets.only(
-                left: 9.h,
-                top: 10.v,
-                bottom: 10.v,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CustomImageView(
-                    imagePath: ImageConstant.imgIcRoundLogout,
-                    height: 26.v,
-                    width: 24.h,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: 28.h,
-                      top: 6.v,
-                    ),
-                    child: Text(
-                      "Logout",
-                      style: CustomTextStyles.titleMediumRedA200,
-                    ),
-                  ),
-                  Spacer(),
-                  CustomImageView(
-                    imagePath: ImageConstant.imgArrowRight,
-                    height: 26.v,
-                    width: 24.h,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
+class User {
+  final String name;
+  final String email;
+  final String address;
+
+  User({required this.name, required this.email, required this.address});
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      name: json['name'],
+      email: json['email'],
+      address: json['address'],
+    );
+  }
 }

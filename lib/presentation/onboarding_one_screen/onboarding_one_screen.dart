@@ -75,8 +75,8 @@ class OnboardingOneScreen extends StatelessWidget {
                   right: 12.h,
                 ),
                 child: Text(
-                  "Consult only with a doctor you trust",
-                  maxLines: 2,
+                  "Jangan biarkan diare mengganggu aktivitas Anda!",
+                  maxLines: 4,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.titleLarge!.copyWith(
                     height: 1.50,

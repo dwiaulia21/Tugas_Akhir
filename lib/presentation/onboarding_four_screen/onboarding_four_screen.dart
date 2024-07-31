@@ -2,12 +2,10 @@ import 'package:awull_s_application3/widgets/custom_elevated_button.dart';
 import 'package:awull_s_application3/widgets/custom_outlined_button.dart';
 import 'package:flutter/material.dart';
 import 'package:awull_s_application3/core/app_export.dart';
+import 'package:awull_s_application3/widgets/custom_image_view.dart';
 
 class OnboardingFourScreen extends StatelessWidget {
-  const OnboardingFourScreen({Key? key})
-      : super(
-          key: key,
-        );
+  const OnboardingFourScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +20,9 @@ class OnboardingFourScreen extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Spacer(
-                flex: 40,
-              ),
+              Spacer(flex: 40),
               _buildGetStartedSection(context),
-              Spacer(
-                flex: 59,
-              ),
+              Spacer(flex: 59),
               CustomElevatedButton(
                 text: "Login",
                 onPressed: () {
@@ -43,7 +37,7 @@ class OnboardingFourScreen extends StatelessWidget {
                 onPressed: () {
                   onTapSignUp(context);
                 },
-              )
+              ),
             ],
           ),
         ),
@@ -58,19 +52,14 @@ class OnboardingFourScreen extends StatelessWidget {
       child: Column(
         children: [
           CustomImageView(
-            imagePath: ImageConstant.imgThumbsUp,
-            height: 66.v,
-            width: 59.h,
+            imagePath: 'assets/images/img_logodiare.png',
+            height: 350.v,
+            width: 350.h,
           ),
-          SizedBox(height: 5.v),
-          Text(
-            "Helthio",
-            style: CustomTextStyles.headlineSmallPrimary,
-          ),
-          SizedBox(height: 38.v),
+          SizedBox(height: 2.v),
           Text(
             "Let’s get started!",
-            style: theme.textTheme.headlineSmall,
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
           SizedBox(height: 7.v),
           SizedBox(
@@ -84,7 +73,7 @@ class OnboardingFourScreen extends StatelessWidget {
                 height: 1.50,
               ),
             ),
-          )
+          ),
         ],
       ),
     );

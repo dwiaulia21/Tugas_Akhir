@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
           theme: theme,
           title: 'awull_s_application3', 
           debugShowCheckedModeBanner: false,
-          initialRoute: AppRoutes.loginScreen,
+          initialRoute: AppRoutes.onboardingOneScreen,
           routes: AppRoutes.routes,
         );
       },

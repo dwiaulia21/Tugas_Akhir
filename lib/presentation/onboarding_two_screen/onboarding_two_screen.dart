@@ -75,8 +75,8 @@ class OnboardingTwoScreen extends StatelessWidget {
                   right: 58.h,
                 ),
                 child: Text(
-                  "Find a lot of specialist doctors in one place",
-                  maxLines: 2,
+                  "Tidak perlu khawatir dengan Diare!",
+                  maxLines: 4,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.titleLarge!.copyWith(
                     height: 1.50,
