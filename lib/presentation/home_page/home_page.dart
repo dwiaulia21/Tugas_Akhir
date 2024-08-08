@@ -82,8 +82,8 @@ class _HomePageState extends State<HomePage> {
       height: 200.v,
       title: AppbarSubtitle(
         text: 'Halo!', // Display user name in AppBar
-        margin: EdgeInsets.only(left: 30.h),
-      ),
+        margin: EdgeInsets.only(left: 30.h), style: TextStyle(color: Colors.black),
+      ), gradient: LinearGradient(colors: Colors.primaries),
     );
   }
 }

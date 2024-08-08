@@ -52,7 +52,7 @@ class LocationScreen extends StatelessWidget {
       centerTitle: true,
       title: AppbarSubtitleOne(
         text: "Ambulance",
-      ),
+      ),gradient: LinearGradient(colors: Colors.primaries),
     );
   }
 

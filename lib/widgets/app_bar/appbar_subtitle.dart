@@ -7,7 +7,7 @@ class AppbarSubtitle extends StatelessWidget {
     Key? key,
     required this.text,
     this.margin,
-    this.onTap,
+    this.onTap, required TextStyle style,
   }) : super(
           key: key,
         );

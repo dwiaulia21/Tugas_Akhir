@@ -10,7 +10,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.leading,
     this.title,
     this.centerTitle,
-    this.actions,
+    this.actions, required LinearGradient gradient,
   }) : super(
           key: key,
         );

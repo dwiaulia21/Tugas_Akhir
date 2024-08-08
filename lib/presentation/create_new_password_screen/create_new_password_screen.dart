@@ -126,7 +126,7 @@ class CreateNewPasswordScreen extends StatelessWidget {
       leading: AppbarLeadingImage(
         imagePath: ImageConstant.imgIconChevronLeftOnprimary,
         margin: EdgeInsets.fromLTRB(32.h, 8.v, 319.h, 8.v),
-      ),
+      ), gradient: LinearGradient(colors: Colors.primaries),
     );
   }
 

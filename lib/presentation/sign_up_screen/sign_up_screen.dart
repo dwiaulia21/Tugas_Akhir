@@ -13,7 +13,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController addressController = TextEditingController();
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  static const String baseUrl = 'http://192.168.235.111/cekginjal/register_api.php';
+  static const String baseUrl = 'http://192.168.206.111/cekginjal/register_api.php';
 
   Future<void> registerUser(BuildContext context) async {
     if (!_formKey.currentState!.validate()) {

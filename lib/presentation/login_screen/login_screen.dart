@@ -21,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.235.111/cekginjal/login_api.php'),
+        Uri.parse('http://192.168.206.111/cekginjal/login_api.php'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'email': emailController.text,
